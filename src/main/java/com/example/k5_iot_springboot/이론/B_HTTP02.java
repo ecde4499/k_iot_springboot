@@ -52,5 +52,5 @@ package com.example.k5_iot_springboot.이론;
                 500 Internal Server Error: 서버 문제
  */
 
-public class HTTP02 {
+public class B_HTTP02 {
 }
