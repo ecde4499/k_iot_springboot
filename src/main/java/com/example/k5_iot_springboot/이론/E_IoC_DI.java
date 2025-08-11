@@ -100,9 +100,9 @@ class BookStore2 {
 //  Ex) Book -> book, BookStore -> bookStore 등
 //          이름 설정 @Component("bookSpecial")
 
-@Configuration
+// @Configuration
 class ExampleAppConfig {
-    @Bean
+//    @Bean
     public void ExampleBean() {
         System.out.println("예시 빈 등록");
     }
