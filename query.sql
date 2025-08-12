@@ -10,3 +10,11 @@ CREATE DATABASE IF NOT EXISTS k5_iot_springboot
     
 # 3. 스키마 선택
 USE k5_iot_springboot;
+
+# 0811 (A_Test)
+CREATE TABLE IF NOT EXISTS test (
+	id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(50) NOT NULL
+);
+
+SELECT * FROM test;
