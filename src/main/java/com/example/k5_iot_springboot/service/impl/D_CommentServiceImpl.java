@@ -9,7 +9,6 @@ import com.example.k5_iot_springboot.entity.D_Post;
 import com.example.k5_iot_springboot.repository.D_CommentRepository;
 import com.example.k5_iot_springboot.repository.D_PostRepository;
 import com.example.k5_iot_springboot.service.D_CommentService;
-import com.example.k5_iot_springboot.service.D_PostService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,7 @@ public class D_CommentServiceImpl implements D_CommentService {
         D_Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 ID의 게시글을 찾을 수 없습니다."));
 
-        D_Comment comment = D_Comment.create(dto.content(), dto.Commenter());
+        D_Comment comment = D_Comment.create(dto.content(), dto.commenter());
         post.addComment(comment); // 연관관계 편의 메서드
         D_Comment saved = commentRepository.save(comment); // 주인 측 저장
 

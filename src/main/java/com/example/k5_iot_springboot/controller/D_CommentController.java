@@ -16,7 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(ApiMappingPattern.Comments.ROOT)
+@RequestMapping(ApiMappingPattern.Comments.ROOT) // "/api/v1/posts/{postId}/comments"
 @RequiredArgsConstructor
 @Validated
 public class D_CommentController {
