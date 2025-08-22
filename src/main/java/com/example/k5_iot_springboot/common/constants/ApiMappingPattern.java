@@ -1,5 +1,7 @@
 package com.example.k5_iot_springboot.common.constants;
 
+import com.example.k5_iot_springboot.entity.base.BaseTimeEntity;
+
 // URL 설계 패턴
 // : RESTful 하게 API 경로를 규칙적으로 설계하는 것
 // - 각 Controller의 교유 경로를 지정
@@ -53,5 +55,13 @@ public class ApiMappingPattern {
         public static final String ID_ONLY = "/{commentId}";
         public static final String BY_ID = ROOT + "/{commentId}";
 
+    }
+
+    // == 4. 게시글(F_Board) == //
+    public static final class Boards {
+        private Boards() {}
+
+        public static final String ROOT = BASE + "/boards";
+        public static final String ID_ONLY = "/{boardId}";
     }
 }
