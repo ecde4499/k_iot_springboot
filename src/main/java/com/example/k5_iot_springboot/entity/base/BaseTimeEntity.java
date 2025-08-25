@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @Getter
 @MappedSuperclass // 실제 테이블은 만들지 않고, 필드를 자식 엔티티 컬럼에 포함시킴
 @EntityListeners(AuditingEntityListener.class) // Auditing 이벤트 리스너 활성화
-public class BaseTimeEntity {
+public abstract class BaseTimeEntity {
 
     /*
         레코드 최초 생성 시 자동 세팅되는 시간(UTC 기준)
