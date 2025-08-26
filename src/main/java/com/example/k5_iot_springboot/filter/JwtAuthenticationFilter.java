@@ -82,7 +82,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             // 4) "Bearer " 접두사가 없으면 형식 오류 - 401 즉시 응답
-            if (authorization.startsWith(BEARER_PREFIX)) {
+            if (!authorization.startsWith(BEARER_PREFIX)) {
                 unauthorized(response, "Authorization 헤더는 'Bearer <toke>' 형식이어야 합니다.");
                 return;
             }
