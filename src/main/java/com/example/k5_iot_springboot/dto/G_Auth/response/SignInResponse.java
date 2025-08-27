@@ -5,7 +5,7 @@ import java.util.Set;
 public record SignInResponse(
         String tokenType,       // "Bearer"
         String accessToken,     // JWT
-        Long expiresAt,         // 만료시각 (ms)
+        long expiresAt,         // 만료시각 (ms)
         String username,        // loginId
         Set<String> roles       // ["ROLE_USER"]
 ) {}

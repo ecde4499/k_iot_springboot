@@ -9,7 +9,11 @@ package com.example.k5_iot_springboot.filter;
     cf) Spring Security가 OncePerRequestFilter를 상속받아 매 요청마다 실행
  */
 
+import com.example.k5_iot_springboot.entity.G_User;
 import com.example.k5_iot_springboot.provider.JwtProvider;
+import com.example.k5_iot_springboot.repository.G_UserRepository;
+import com.example.k5_iot_springboot.security.UserPrincipal;
+import com.example.k5_iot_springboot.security.UserPrincipalMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +27,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -42,6 +47,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String BEARER_PREFIX = JwtProvider.BEARER_PREFIX;
 
     private final JwtProvider jwtProvider; // 의존성 주입
+    private final G_UserRepository g_UserRepository;
+    private final UserPrincipalMapper principalMapper;
 
     /** OncePerRequestFilter 내부 추상 메서드 - 반드시 구현!
      * => 스프링 시큐리티 필터가 매요청마다 호출하는 핵심 메서드
@@ -102,17 +109,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             // 7) 사용자 식별자 & 권한 추출
             String username = jwtProvider.getUsernameFromJwt(token);
-            Set<String> roles = jwtProvider.getRolesFromJwt(token);
+
+            // +) DB 재조회 - UserPrincipal 구성 (최신 권한/상태 반영)
+            G_User user = g_UserRepository.findByLoginId(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+
+            // Set<String> roles = jwtProvider.getRolesFromJwt(token);
 
             // 8) 권한 문자열 - GrantedAuthority로 매핑 ("ROLE_" 접두어 보장)
             // : 스프링 시큐리티가 이해하는 권한 타입으로 변환
             // => 권한명 앞에 "ROLE_" 접두사가 필요
-            Collection<? extends GrantedAuthority> authorities = toAuthorities(roles);
+            // Collection<? extends GrantedAuthority> authorities = toAuthorities(roles);
+
+            // => user 데이터의 최신 권한을 반영
+            UserPrincipal principal = principalMapper.map(user);
 
             // 9) SecurityContext에 인증 저장
             // : 인증 객체를 만들고 SecurityContext에 저장
             // => 해당 시점부터 현재 요청은 "username 이라는 사용자가 authorities 권한으로 인증됨" 상태가 됨
-            setAuthenticationContext(request, username, authorities);
+            setAuthenticationContext(request, principal);
 
         } catch (Exception e) {
             logger.warn("JWT filter error", e);
@@ -126,8 +141,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // SecurityContextHolder에 인증 객체 세팅
     private void setAuthenticationContext (
             HttpServletRequest request,
-            String username,
-            Collection<? extends GrantedAuthority> authorities
+            UserPrincipal principal
     ) {
         // 0) 사용자 아이디 (또는 고유 데이터)를 바탕으로 인증 토큰 생성
         // UsernamePasswordAuthenticationToken 클래스는 스프링 시큐리티에서 자주 쓰이는
@@ -139,7 +153,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // cf) 권한이 있는 경우(비워지지 않은 경우) - isAuthenticated=true
         AbstractAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(username, null, authorities);
+                new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
 
         // 요청에 대한 세부 정보 설정
         // : 생성된 인증 토큰에 요청의 세부사항 설정 (예: 원격 IP, 세선 ID 등)
