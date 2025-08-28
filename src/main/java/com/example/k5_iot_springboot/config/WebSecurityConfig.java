@@ -161,19 +161,23 @@ public class WebSecurityConfig {
                         // 인증/회원가입 등 공개 엔드포인트 - 토큰이 필요없는 기능
                         .requestMatchers("/api/v1/auth/**").permitAll()
 
-                        // 마이페이지(내 정보) - 인증 필요 (모든 역할 가능)
-                        .requestMatchers("/api/v1/users/me/**").authenticated()
+                            // 마이페이지(내 정보) - 인증 필요 (모든 역할 가능)
+                            .requestMatchers("/api/v1/users/me/**").authenticated()
 
-                        // boards 접근 제어
-                        .requestMatchers(HttpMethod.GET, "/api/v1/boards**").hasAnyRole("USER","MANAGER","ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/boards**").hasAnyRole("MANAGER", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/boards**").hasAnyRole("MANAGER", "ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/boards**").hasAnyRole("ADMIN")
+                            // boards 접근 제어
+                            .requestMatchers(HttpMethod.GET, "/api/v1/boards**").hasAnyRole("USER","MANAGER","ADMIN")
+                            .requestMatchers(HttpMethod.POST, "/api/v1/boards**").hasAnyRole("MANAGER", "ADMIN")
+                            .requestMatchers(HttpMethod.PUT, "/api/v1/boards**").hasAnyRole("MANAGER", "ADMIN")
+                            .requestMatchers(HttpMethod.DELETE, "/api/v1/boards**").hasAnyRole("ADMIN")
 
-                        // ADMIN 전용 권한 관리 API
-                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                            // articles 접근 제어
+                            .requestMatchers(HttpMethod.GET, "/api/v1/articles/**").permitAll()
 
-                        .anyRequest().authenticated(); // 나머지는 인증 필요 - JWT 토큰이 있어야 접근 가능
+                            // ADMIN 전용 권한 관리 API
+                            .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+
+
+                            .anyRequest().authenticated(); // 나머지는 인증 필요 - JWT 토큰이 있어야 접근 가능
                         }
                 );
 

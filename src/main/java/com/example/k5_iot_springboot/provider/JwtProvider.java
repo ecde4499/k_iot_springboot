@@ -105,7 +105,7 @@ public class JwtProvider {
      *
      * subject=sub(username), roles는 커스텀 클레임 */
     public String generateJwtToken(String username, Set<String> roles) {
-        long now = System.currentTimeMillis();
+        long now = System.currentTimeMillis(); // 현재시간을 밀리초 단위로 반환
         Date iat = new Date(now);
         Date exp = new Date(now + jwtExpirationMs);
 
