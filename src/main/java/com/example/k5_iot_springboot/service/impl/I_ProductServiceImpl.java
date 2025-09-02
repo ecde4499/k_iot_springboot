@@ -4,7 +4,9 @@ import com.example.k5_iot_springboot.dto.I_Order.request.ProductRequest;
 import com.example.k5_iot_springboot.dto.I_Order.response.ProductResponse;
 import com.example.k5_iot_springboot.dto.ResponseDto;
 import com.example.k5_iot_springboot.entity.I_Product;
+import com.example.k5_iot_springboot.entity.I_Stock;
 import com.example.k5_iot_springboot.repository.I_ProductRepository;
+import com.example.k5_iot_springboot.repository.I_StockRepository;
 import com.example.k5_iot_springboot.security.UserPrincipal;
 import com.example.k5_iot_springboot.service.I_ProductService;
 import jakarta.persistence.EntityNotFoundException;
@@ -21,6 +23,7 @@ import java.util.Objects;
 @Transactional(readOnly = true)
 public class I_ProductServiceImpl implements I_ProductService {
     private final I_ProductRepository productRepository;
+    private final I_StockRepository stockRepository;
 
     @Override
     @Transactional
@@ -37,9 +40,15 @@ public class I_ProductServiceImpl implements I_ProductService {
                 .price(req.price())
                 .build();
 
-        I_Product save = productRepository.save(product);
+        I_Product saved = productRepository.save(product);
 
-        data = new ProductResponse.Response(save.getId(), save.getName(), save.getPrice());
+        stockRepository.save(
+            I_Stock.builder()
+                    .product(saved)
+                    .build()
+        );
+
+        data = new ProductResponse.Response(saved.getId(), saved.getName(), saved.getPrice());
 
         return ResponseDto.setSuccess("제품이 성공적으로 등록되었습니다.", data);
     }
