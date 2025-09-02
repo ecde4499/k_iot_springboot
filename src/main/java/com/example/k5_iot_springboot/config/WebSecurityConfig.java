@@ -173,6 +173,11 @@ public class WebSecurityConfig {
                             // articles 접근 제어
                             .requestMatchers(HttpMethod.GET, "/api/v1/articles/**").permitAll()
 
+                            // products 접근 제어
+                            .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
+                            .requestMatchers(HttpMethod.POST, "/api/v1/products/**").hasAnyRole("ADMIN")
+                            .requestMatchers(HttpMethod.PUT, "/api/v1/products/**").hasAnyRole("ADMIN")
+
                             // ADMIN 전용 권한 관리 API
                             .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 
