@@ -71,7 +71,7 @@ public class I_OrderController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)LocalDateTime from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)LocalDateTime to
     ) {
-        ResponseDto<List<OrderResponse.Detail>> response = orderService.search(userId, status, from, to);
+        ResponseDto<List<OrderResponse.Detail>> response = orderService.search(userPrincipal, userId, status, from, to);
         return ResponseEntity.ok(response);
     }
 }
