@@ -110,7 +110,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String username = jwtProvider.getUsernameFromJwt(token);
 
             // +) DB 재조회 - UserPrincipal 구성 (최신 권한/상태 반영)
-            G_User user = g_UserRepository.findByLoginId(username)
+            G_User user = g_UserRepository.findWithRolesByLoginId(username)
                     .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
 
             // Set<String> roles = jwtProvider.getRolesFromJwt(token);

@@ -340,6 +340,21 @@ VALUES
 	(3, 70, NOW(6), NOW(6)),
 	(4, 20, NOW(6), NOW(6));
 
+CREATE TABLE refresh_tokens (
+	id BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    username VARCHAR(100) NOT NULL,
+    token VARCHAR(512) NOT NULL,
+    expiry BIGINT NOT NULL,
+    
+    UNIQUE KEY `uk_refresh_username` (username),
+    UNIQUE KEY `uk_refresh_token` (token)
+)
+ENGINE=InnoDB
+DEFAULT CHARSET = utf8mb4
+COLLATE = utf8mb4_unicode_ci
+COMMENT = 'JWT Refresh Token 저장 테이블';
+
+
 SELECT * FROM `products`;
 SELECT * FROM `stocks`;
 SELECT * FROM `orders`;

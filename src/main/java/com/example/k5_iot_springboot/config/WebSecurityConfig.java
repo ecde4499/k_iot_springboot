@@ -99,7 +99,7 @@ public class WebSecurityConfig {
 
         // 1) 인증 정보(쿠키Authorization) 허용
         config.setAllowCredentials(true);                       // 1) 인증 정보(쿠키/자격 증명 헤더) 허용
-        // config.setAllowedOriginPatterns(origins);               // 2) Origin 설정 - 도메인 매칭
+        config.setAllowedOriginPatterns(origins);               // 2) Origin 설정 - 도메인 매칭
         // => 허용 origin을 *로 둘 수 없음 (반드시 구체적인 도메인이어야 함)
         config.setAllowedHeaders(splitToList(allowedHeaders));  // 3) 요청 헤더 화이트리스트
         config.setAllowedMethods(splitToList(allowedMethods));  // 4) 허용 메서드
@@ -160,38 +160,39 @@ public class WebSecurityConfig {
                         // === URL 레벨에서 1차 차단 (+ 컨트롤러 메서드에서 @PreAuthorize로 2차 방어) === //
                         // 인증/회원가입 등 공개 엔드포인트 - 토큰이 필요없는 기능
                         .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/v1/notices/**").permitAll()
 
-                            // 마이페이지(내 정보) - 인증 필요 (모든 역할 가능)
-                            .requestMatchers("/api/v1/users/me/**").authenticated()
+                        // 마이페이지(내 정보) - 인증 필요 (모든 역할 가능)
+                        .requestMatchers("/api/v1/users/me/**").authenticated()
 
-                            // boards 접근 제어
-                            .requestMatchers(HttpMethod.GET, "/api/v1/boards**").hasAnyRole("USER","MANAGER","ADMIN")
-                            .requestMatchers(HttpMethod.POST, "/api/v1/boards**").hasAnyRole("MANAGER", "ADMIN")
-                            .requestMatchers(HttpMethod.PUT, "/api/v1/boards**").hasAnyRole("MANAGER", "ADMIN")
-                            .requestMatchers(HttpMethod.DELETE, "/api/v1/boards**").hasAnyRole("ADMIN")
+                        // boards 접근 제어
+                        .requestMatchers(HttpMethod.GET, "/api/v1/boards**").hasAnyRole("USER","MANAGER","ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/boards**").hasAnyRole("MANAGER", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/boards**").hasAnyRole("MANAGER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/boards**").hasAnyRole("ADMIN")
 
-                            // articles 접근 제어
-                            .requestMatchers(HttpMethod.GET, "/api/v1/articles/**").permitAll()
+                        // articles 접근 제어
+                        .requestMatchers(HttpMethod.GET, "/api/v1/articles/**").permitAll()
 
-                            // products 접근 제어
-                            .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
-                            .requestMatchers(HttpMethod.POST, "/api/v1/products/**").hasAnyRole("ADMIN")
-                            .requestMatchers(HttpMethod.PUT, "/api/v1/products/**").hasAnyRole("ADMIN")
+                        // products 접근 제어
+                        .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/products/**").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/products/**").hasAnyRole("ADMIN")
 
-                            // stocks 접근 제어
-                            .requestMatchers(HttpMethod.GET, "/api/v1/stocks/**").permitAll()
-                            .requestMatchers(HttpMethod.POST,"/api/v1/stocks/**").hasAnyRole("ADMIN","MANAGER")
-                            .requestMatchers(HttpMethod.PUT, "/api/v1/stocks/**").hasAnyRole("ADMIN","MANAGER")
+                        // stocks 접근 제어
+                        .requestMatchers(HttpMethod.GET, "/api/v1/stocks/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/v1/stocks/**").hasAnyRole("ADMIN","MANAGER")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/stocks/**").hasAnyRole("ADMIN","MANAGER")
 
-                            // Orders 접근 제어
-
-
-                            // ADMIN 전용 권한 관리 API
-                            .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                        // Orders 접근 제어
 
 
-                            .anyRequest().authenticated(); // 나머지는 인증 필요 - JWT 토큰이 있어야 접근 가능
-                        }
+                        // ADMIN 전용 권한 관리 API
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+
+
+                        .anyRequest().authenticated(); // 나머지는 인증 필요 - JWT 토큰이 있어야 접근 가능
+                    }
                 );
 
         // JWT 인증 필터를 UsernamePasswordAuthenticationFilter 앞에 배치

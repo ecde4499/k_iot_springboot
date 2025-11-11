@@ -130,7 +130,7 @@ public class F_BoardServiceImpl implements F_BoardService {
 
     @Override
     public ResponseDto<BoardResponseDto.PageResponse> getBoardsPage(Pageable pageable) {
-//        Pageable pageable = bulidPageable(page, size, sort);
+//        Pageable pageable = buildPageable(page, size, sort);
 
         // cf) Pageable 인터페이스
         //      : 페이징과 정렬 정보를 추상화한 인터페이스

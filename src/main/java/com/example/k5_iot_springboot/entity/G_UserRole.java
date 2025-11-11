@@ -21,7 +21,7 @@ public class G_UserRole {
     @MapsId("userId")
     // 해당 필드와 연관된 FK(user_id) 값이 해당 엔티티의 식별자(PK) 중 userId 라는 필드를 채움
     // : 주로 복합키 매핑에 사용
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(
             name = "user_id",
             nullable = false,
@@ -31,7 +31,7 @@ public class G_UserRole {
 
     /* 복합키의 role_name를 G_Role의 PK에 매핑 */
     @MapsId("roleName")
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(
             name = "role_name",
             nullable = false,

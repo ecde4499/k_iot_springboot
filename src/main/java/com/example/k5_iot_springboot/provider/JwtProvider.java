@@ -23,10 +23,7 @@ package com.example.k5_iot_springboot.provider;
  */
 
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,6 +56,8 @@ public class JwtProvider {
     // 환경 변수에 지정한 비밀키와 만료 시간 저장 변수 선언
     private final SecretKey key;
     private final long jwtExpirationMs;
+    private final long jwtRefreshExpirationMs;
+    private final long jwtEmailExpirationMs;
     private final int clockSkewSeconds;
 
     // 검증/파싱 파서: 파서를 생성자에서 1회 구성하여 재사용 - 성능/일관성 보장 (JJWT의 파서 객체)
@@ -70,6 +69,8 @@ public class JwtProvider {
             //      => 데이터 타입 자동 인식
         @Value("${jwt.secret}") String secret, // cf) Base64 인코딩된 비밀키 문자열이어야 함!
         @Value("${jwt.expiration}") long jwtExpirationMs,
+        @Value("${jwt.refresh-expiration}") long jwtRefreshExpirationMs,
+        @Value("${jwt.email-expiration}") long jwtEmailExpirationMs,
         @Value("${jwt.clock-skew-seconds:0}") int clockSkewSeconds // 기본 0; - 옵션
     ) {
         // 생성자: JwtProvider 객체 생성 시 비밀키와 만료시간 초기화
@@ -85,6 +86,8 @@ public class JwtProvider {
         // HMAC-SHA 알고리즘으로 암호화된 키 생성
         this.key = Keys.hmacShaKeyFor(secretBytes); // HMAC-SHA 용 SecretKey 객체 생성
         this.jwtExpirationMs = jwtExpirationMs;
+        this.jwtRefreshExpirationMs = jwtRefreshExpirationMs;
+        this.jwtEmailExpirationMs = jwtEmailExpirationMs;
         this.clockSkewSeconds = Math.max(clockSkewSeconds, 0); // 음수 방지
 
         this.parser = Jwts.parser()
@@ -99,15 +102,27 @@ public class JwtProvider {
      */
 
     /**
-     * 엑세스 토큰 생성
+     * 엑세스(Access) 토큰 생성
      * @param username sub(Subject)에 저장할 사용자 식별자
      * @param roles 권한 목록(중복 제거용 Set 권장) - JSON 배열로 직렬화
      *
      * subject=sub(username), roles는 커스텀 클레임 */
     public String generateJwtToken(String username, Set<String> roles) {
+        return buildToken(username, roles, jwtExpirationMs);
+    }
+
+    /**
+     * 리프레시(Refresh) 토큰 생성
+     * */
+    public String generateRefreshKoken(String username, Set<String> roles) {
+        return buildToken(username, roles, jwtRefreshExpirationMs);
+    }
+
+    /** 공통 빌드 로직 (Access + Refresh) */
+    private String buildToken(String username, Set<String> roles, long expirationMs) {
         long now = System.currentTimeMillis(); // 현재시간을 밀리초 단위로 반환
         Date iat = new Date(now);
-        Date exp = new Date(now + jwtExpirationMs);
+        Date exp = new Date(now + expirationMs);
 
         // List로 변환하여 직렬화 시 타입 안정성 확보
         List<String> roleList = (roles == null) ? List.of() : new ArrayList<>(roles);
@@ -120,6 +135,15 @@ public class JwtProvider {
                 .setExpiration(exp) // 현재 시간에 만료 시간을 더한 설정 (만료 시간)
                 .signWith(key) // 서명 키로 서명 (자동 HS256 선택) - 비밀키를 서명
                 .compact(); // 빌더를 압축하여 최종 JWT 문자열 생성
+    }
+
+    public String generateEmailJwtToken(String email) {
+        return Jwts.builder()
+                .claim("email", email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + jwtEmailExpirationMs))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
     }
 
     /*
@@ -225,6 +249,11 @@ public class JwtProvider {
         }
 
         return Set.of(raw.toString());
+    }
+
+    public String getEmailFromJwt(String token) {
+        Claims claims = getClaims(token);
+        return claims.get("email", String.class);
     }
 
     // 남은 만료 시간(ms)이 음수면 이미 만료

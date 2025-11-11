@@ -28,7 +28,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor // final 필드 OR @NonNull 필드만을 매개변수로 가지는 생성자
 @Transactional(readOnly = true)
-public class I_OrderServiceImpl implements I_OrderService {
+public class I_OrderServiceImpl implements I_OrderService{
     private final EntityManager em; // 상용자 참조 = getReference 등
     private final I_OrderRepository orderRepository;
     private final I_ProductRepository productRepository;

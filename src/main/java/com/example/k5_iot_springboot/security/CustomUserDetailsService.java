@@ -41,7 +41,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         // 현재는 loginId를 username 으로 활용하는 정책!
         // +) 이메일 로그인 정책 시 userRepository.findByEmail(username) 형태로 변경
-        G_User user = userRepository.findByLoginId(username)
+        G_User user = userRepository.findWithRolesByLoginId(username)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username));
 
         // 도메인 엔티티를 보안 VO 객체로 변환하여 반환
