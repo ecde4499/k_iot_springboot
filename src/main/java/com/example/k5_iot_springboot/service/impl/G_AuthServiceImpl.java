@@ -87,7 +87,9 @@ public class G_AuthServiceImpl implements G_AuthService {
      * - 인증 성공 시 Access/Refresh Token 발금
      * - Refresh Token DB + 쿠키 저장
      * */
+
     @Override // 읽기 전용
+    @Transactional
     public ResponseDto<SignInResponse> signIn(SignInRequest req, HttpServletResponse response) {
 
         // 스프링 시큐리티 표준 인증 흐름 (UserDetailsService + PasswordEncoder)
@@ -114,6 +116,7 @@ public class G_AuthServiceImpl implements G_AuthService {
         // +) Refresh Token 저장 (기존의 토큰 삭제 후 신규 저장)
         long expiry = System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000L;
         refreshTokenRepository.deleteByUsername(req.loginId());
+        refreshTokenRepository.flush(); // DB에 즉시 반영
         refreshTokenRepository.save(
                 RefreshToken.builder()
                         .username(req.loginId())
@@ -176,6 +179,7 @@ public class G_AuthServiceImpl implements G_AuthService {
     }
 
     @Override
+    @Transactional
     public void deleteRefreshToken(UserPrincipal userPrincipal) {
         refreshTokenRepository.deleteByUsername(userPrincipal.getUsername());
     }

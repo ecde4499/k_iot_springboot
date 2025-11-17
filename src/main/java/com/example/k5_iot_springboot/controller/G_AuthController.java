@@ -44,7 +44,7 @@ public class G_AuthController {
     }
 
     /** 로그아웃 (RefreshToken 쿠키 삭제) */
-    @PostMapping("/logout")
+    @PostMapping("/sign-out")
     public ResponseEntity<?> logout(
             HttpServletResponse response,
             @AuthenticationPrincipal UserPrincipal userPrincipal
